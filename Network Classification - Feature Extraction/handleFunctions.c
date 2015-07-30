@@ -206,7 +206,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
             perror("fİLE ERROR");
         }
         isForward = 1;
-        fprintf(arfFile, "%d, %d, %d, %d, %.15f, %.15f, %.15f, %.15f, %.15f, %.15f, %.15f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,",
+        fprintf(arfFile, "%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,",
                 flowTable[index]->forwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount),
                 minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount),
@@ -227,7 +227,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
         isForward = 0;
         Packet ** tempPacketArray2 = getFixedSizedPacketsFromFlow(index, 0);
         densityArray = density(tempPacketArray2, flowTable[index]->backwardPacketCount);
-        fprintf(arfFile, " %d, %d, %d, %d, %.15f, %.15f, %.15f, %.15f, %.15f, %.15f, %.15f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s\n",
+        fprintf(arfFile, " %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s\n",
                 flowTable[index]->backwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount),
                 minPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount),
