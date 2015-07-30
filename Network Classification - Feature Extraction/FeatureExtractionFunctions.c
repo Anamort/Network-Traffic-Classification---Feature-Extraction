@@ -208,3 +208,36 @@ int * density(Packet *packetArray[],int size){
     return density;
 }
 
+double numberOfBytesToPacketCount(double byteCount, double pcktCount){
+    if (pcktCount != 0) {
+        return byteCount / pcktCount;
+    }else{
+        return 0;
+    }
+    
+}
+
+double minIntervalvsPacketCount(double minInterval, double pcktCount){
+    return minInterval * pcktCount;
+}
+
+double maxIntervalvsPacketCount(double maxInterval, double pcktCount){
+    return maxInterval * pcktCount;
+}
+
+double maxPacketSizeToStandardDeviation(double maxPacketSize, double stdDeviation){
+    if (stdDeviation != 0) {
+        return maxPacketSize / stdDeviation;
+    }else{
+        return 0;
+    }
+
+}
+
+double averagePacketSizeToStandardDeviation(double averagePacketSize, double stdDeviation){
+    if (stdDeviation != 0) {
+        return averagePacketSize / stdDeviation;
+    }else{
+        return 0;
+    }
+}
