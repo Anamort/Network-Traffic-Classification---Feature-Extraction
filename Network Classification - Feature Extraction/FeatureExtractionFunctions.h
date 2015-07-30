@@ -32,8 +32,5 @@ int * density(Packet *packetArray[],int size);
 //numberOfPackets = size
 //protocol = inside the packet
 
-//to find maximum & minimum packet time in a specisific packet array to determine passed time
-double maxPacketTime (Packet *packetArray[],int size);
-double minPacketTime (Packet *packetArray[],int size);
 
 #endif /* defined(__Network_Classification___Feature_Extraction__FeatureExtractionFunctions__) */
