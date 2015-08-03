@@ -22,6 +22,7 @@ double maxIntervalPacketTime(Packet *packetArray[],int size); //based on arrival
 double averageIntervalPacketTime(Packet *packetArray[],int size); //based on arrival time
 double standardDeviationOfIntervalPacketTime(Packet *packetArray[],int size); //based on arrival time
 double durationForFixedPackets(Packet *packetArray[],int size); //dogrulugundan emin olamadigim fonksiyon,maxPacketTime ve maxPacketTime kaynaklı
+
 double numberOfBytesToPacketCount(double byteCount, double pcktCount);
 double minIntervalvsPacketCount(double minInterval, double pcktCount);
 double maxIntervalvsPacketCount(double maxInterval, double pcktCount);

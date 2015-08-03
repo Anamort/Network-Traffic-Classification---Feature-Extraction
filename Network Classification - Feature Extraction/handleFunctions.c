@@ -206,7 +206,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
             perror("fİLE ERROR");
         }
         isForward = 1;
-        fprintf(arfFile, "%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,",
+        fprintf(arfFile, "%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f",
                 flowTable[index]->forwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount),
                 minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount),
@@ -220,14 +220,19 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 durationForFixedPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
                 newPacket->ip_packet.ip_p, //protocol
                 densityArray[0],densityArray[1],densityArray[2],densityArray[3],densityArray[4],
-                densityArray[5],densityArray[6],densityArray[7],densityArray[8],densityArray[9]
+                densityArray[5],densityArray[6],densityArray[7],densityArray[8],densityArray[9],
+                numberOfBytesToPacketCount(numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount), flowTable[index]->forwardPacketCount),
+                minIntervalvsPacketCount(minIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount), flowTable[index]->forwardPacketCount),
+                maxIntervalvsPacketCount(maxIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount), flowTable[index]->forwardPacketCount),
+                maxPacketSizeToStandardDeviation(maxPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount), standardDeviation(tempPacketArray, flowTable[index]->forwardPacketCount)),
+                averagePacketSizeToStandardDeviation(averagePacketLength(tempPacketArray, flowTable[index]->forwardPacketCount), standardDeviationOfIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount))
                 );
         
         // for backward packets
         isForward = 0;
         Packet ** tempPacketArray2 = getFixedSizedPacketsFromFlow(index, 0);
         densityArray = density(tempPacketArray2, flowTable[index]->backwardPacketCount);
-        fprintf(arfFile, " %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s\n",
+        fprintf(arfFile, " %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f, %s, %s\n",
                 flowTable[index]->backwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount),
                 minPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount),
@@ -242,6 +247,11 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 newPacket->ip_packet.ip_p, //protocol
                 densityArray[0],densityArray[1],densityArray[2],densityArray[3],densityArray[4],
                 densityArray[5],densityArray[6],densityArray[7],densityArray[8],densityArray[9],
+                numberOfBytesToPacketCount(numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount), flowTable[index]->backwardPacketCount),
+                minIntervalvsPacketCount(minIntervalPacketTime(tempPacketArray2, flowTable[index]->backwardPacketCount), flowTable[index]->backwardPacketCount),
+                maxIntervalvsPacketCount(maxIntervalPacketTime(tempPacketArray2, flowTable[index]->backwardPacketCount), flowTable[index]->backwardPacketCount),
+                maxPacketSizeToStandardDeviation(maxPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount), standardDeviation(tempPacketArray2, flowTable[index]->backwardPacketCount)),
+                averagePacketSizeToStandardDeviation(averagePacketLength(tempPacketArray2, flowTable[index]->backwardPacketCount), standardDeviationOfIntervalPacketTime(tempPacketArray2, flowTable[index]->backwardPacketCount)),
                 subClass,
                 className
                 );
