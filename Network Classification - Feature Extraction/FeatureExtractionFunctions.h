@@ -34,6 +34,7 @@ double ratioOfForwardAndBackwardPacketCounts(int forwardPacketCount, int backwar
 double ratioOfBytesFAndB(int packetLengthF, int packetLengthB);
 int totalNumberOfACKPackets(Packet *packetArray[],int size);
 int totalNumberOfPUSHPackets(Packet *packetArray[],int size);
+int * binsOfBytes(Packet *packetArray[],int size);
 
 /*
  density: gecen zamani 10 esit parcaya bolerek her parcaya kac paket düstügünü hesaplayan fonksiyon

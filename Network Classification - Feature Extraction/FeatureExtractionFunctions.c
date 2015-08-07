@@ -276,3 +276,18 @@ double ratioOfForwardAndBackwardPacketCounts(int forwardPacketCount, int backwar
 double ratioOfBytesFAndB(int packetLengthF, int packetLengthB){
     return packetLengthF / packetLengthB;
 }
+
+int * binsOfBytes(Packet *packetArray[],int size){
+    int *bins = calloc(10,sizeof(int));
+    
+    int i;
+    for (i=0; i<size; i++) {
+        int section = packetArray[i]->len / 150;
+        if (section > 9) {
+            section = 9;
+        }
+        bins[section]++;
+    }
+    
+    return bins;
+}
