@@ -241,3 +241,38 @@ double averagePacketSizeToStandardDeviation(double averagePacketSize, double std
         return 0;
     }
 }
+
+int totalNumberOfACKPackets(Packet *packetArray[],int size){
+    int ackCount = 0;
+    if (packetArray[0]->isTCP) {
+        
+        int i;
+        for (i = 0; i<size; i++) {
+            if (packetArray[i]->tcp_Packet.th_flags  & TH_ACK){
+                ackCount++;
+            }
+        }
+    }
+    return ackCount;
+}
+
+int totalNumberOfPUSHPackets(Packet *packetArray[],int size){
+    int pushCount = 0;
+    if (packetArray[0]->isTCP) {
+        int i;
+        for (i = 0; i<size; i++) {
+            if (packetArray[i]->tcp_Packet.th_flags  & TH_PUSH){
+                pushCount++;
+            }
+        }
+    }
+    return pushCount;
+}
+
+double ratioOfForwardAndBackwardPacketCounts(int forwardPacketCount, int backwardPacketCount){
+    return forwardPacketCount / backwardPacketCount;
+}
+
+double ratioOfBytesFAndB(int packetLengthF, int packetLengthB){
+    return packetLengthF / packetLengthB;
+}

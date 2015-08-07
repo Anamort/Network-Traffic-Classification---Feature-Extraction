@@ -29,6 +29,12 @@ double maxIntervalvsPacketCount(double maxInterval, double pcktCount);
 double maxPacketSizeToStandardDeviation(double maxPacketSize, double stdDeviation);
 double averagePacketSizeToStandardDeviation(double averagePacketSize, double stdDeviation);
 
+
+double ratioOfForwardAndBackwardPacketCounts(int forwardPacketCount, int backwardPacketCount);
+double ratioOfBytesFAndB(int packetLengthF, int packetLengthB);
+int totalNumberOfACKPackets(Packet *packetArray[],int size);
+int totalNumberOfPUSHPackets(Packet *packetArray[],int size);
+
 /*
  density: gecen zamani 10 esit parcaya bolerek her parcaya kac paket düstügünü hesaplayan fonksiyon
  ancak minPacketTime ve maxPacketTime fonksiyonlarının dogru oldugundan emin olamadigim(mantiksal olarak) icin
