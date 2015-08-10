@@ -212,7 +212,7 @@ double numberOfBytesToPacketCount(double byteCount, double pcktCount){
     if (pcktCount != 0) {
         return byteCount / pcktCount;
     }else{
-        return 0;
+        return byteCount;
     }
     
 }
@@ -229,7 +229,7 @@ double maxPacketSizeToStandardDeviation(double maxPacketSize, double stdDeviatio
     if (stdDeviation != 0) {
         return maxPacketSize / stdDeviation;
     }else{
-        return 0;
+        return maxPacketSize;
     }
 
 }
@@ -238,7 +238,7 @@ double averagePacketSizeToStandardDeviation(double averagePacketSize, double std
     if (stdDeviation != 0) {
         return averagePacketSize / stdDeviation;
     }else{
-        return 0;
+        return averagePacketSize;
     }
 }
 
@@ -270,11 +270,21 @@ int totalNumberOfPUSHPackets(Packet *packetArray[],int size){
 }
 
 double ratioOfForwardAndBackwardPacketCounts(int forwardPacketCount, int backwardPacketCount){
-    return forwardPacketCount / backwardPacketCount;
+    if (backwardPacketCount == 0) {
+        return forwardPacketCount;
+    }else{
+        return (double)forwardPacketCount / backwardPacketCount;
+    }
+    
 }
 
 double ratioOfBytesFAndB(int packetLengthF, int packetLengthB){
-    return packetLengthF / packetLengthB;
+    if (packetLengthB == 0) {
+        return packetLengthF;
+    }else{
+        return (double)packetLengthF / packetLengthB;
+    }
+    
 }
 
 int * binsOfBytes(Packet *packetArray[],int size){

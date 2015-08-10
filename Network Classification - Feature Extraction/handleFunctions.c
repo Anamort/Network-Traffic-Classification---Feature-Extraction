@@ -200,13 +200,15 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
         Packet **tempPacketArray = getFixedSizedPacketsFromFlow(index, 1);
         int *densityArray = (int *)calloc(10, sizeof(int));
         densityArray = density(tempPacketArray, flowTable[index]->forwardPacketCount);
+        int *binsOfBytesForward = (int *)calloc(10, sizeof(int));
+        binsOfBytesForward = binsOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount);
         FILE *arfFile;
         arfFile = fopen("fixedSize.txt","a");
         if (arfFile == NULL) {
             perror("fİLE ERROR");
         }
         isForward = 1;
-        fprintf(arfFile, "%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, ",
+        fprintf(arfFile, "%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,",
                 flowTable[index]->forwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount),
                 minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount),
@@ -225,14 +227,20 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 minIntervalvsPacketCount(minIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount), flowTable[index]->forwardPacketCount),
                 maxIntervalvsPacketCount(maxIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount), flowTable[index]->forwardPacketCount),
                 maxPacketSizeToStandardDeviation(maxPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount), standardDeviation(tempPacketArray, flowTable[index]->forwardPacketCount)),
-                averagePacketSizeToStandardDeviation(averagePacketLength(tempPacketArray, flowTable[index]->forwardPacketCount), standardDeviationOfIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount))
+                averagePacketSizeToStandardDeviation(averagePacketLength(tempPacketArray, flowTable[index]->forwardPacketCount), standardDeviationOfIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount)),
+                totalNumberOfACKPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                totalNumberOfPUSHPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                binsOfBytesForward[0],binsOfBytesForward[1],binsOfBytesForward[2],binsOfBytesForward[3],binsOfBytesForward[4],
+                binsOfBytesForward[5],binsOfBytesForward[6],binsOfBytesForward[7],binsOfBytesForward[8],binsOfBytesForward[9]
                 );
         
         // for backward packets
         isForward = 0;
         Packet ** tempPacketArray2 = getFixedSizedPacketsFromFlow(index, 0);
+        int *binsOfBytesBackward = (int *)calloc(10, sizeof(int));
+        binsOfBytesBackward = binsOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount);
         densityArray = density(tempPacketArray2, flowTable[index]->backwardPacketCount);
-        fprintf(arfFile, " %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f, %s, %s\n",
+        fprintf(arfFile, " %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f,%d, %d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %f, %f, %s, %s\n",
                 flowTable[index]->backwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount),
                 minPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount),
@@ -252,6 +260,12 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 maxIntervalvsPacketCount(maxIntervalPacketTime(tempPacketArray2, flowTable[index]->backwardPacketCount), flowTable[index]->backwardPacketCount),
                 maxPacketSizeToStandardDeviation(maxPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount), standardDeviation(tempPacketArray2, flowTable[index]->backwardPacketCount)),
                 averagePacketSizeToStandardDeviation(averagePacketLength(tempPacketArray2, flowTable[index]->backwardPacketCount), standardDeviationOfIntervalPacketTime(tempPacketArray2, flowTable[index]->backwardPacketCount)),
+                totalNumberOfACKPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                totalNumberOfPUSHPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                binsOfBytesBackward[0],binsOfBytesBackward[1],binsOfBytesBackward[2],binsOfBytesBackward[3],binsOfBytesBackward[4],
+                binsOfBytesBackward[5],binsOfBytesBackward[6],binsOfBytesBackward[7],binsOfBytesBackward[8],binsOfBytesBackward[9],
+                ratioOfForwardAndBackwardPacketCounts(flowTable[index]->forwardPacketCount, flowTable[index]->backwardPacketCount),
+                ratioOfBytesFAndB(numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount), numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount)),
                 subClass,
                 className
                 );
@@ -274,6 +288,8 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
         
         fclose(arfFile);
         free(densityArray);
+        free(binsOfBytesForward);
+        free(binsOfBytesBackward);
     }
     
     }
