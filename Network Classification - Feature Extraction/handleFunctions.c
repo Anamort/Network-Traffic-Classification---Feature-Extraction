@@ -10,7 +10,7 @@
 #include "FeatureExtractionFunctions.h"
 #include <math.h>
 
-
+#define MTU_SIZE 1506
 
 void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packet){
     struct ip *packetIP;
@@ -208,12 +208,12 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
             perror("fİLE ERROR");
         }
         isForward = 1;
-        fprintf(arfFile, "%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,",
+        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,",
                 flowTable[index]->forwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount),
-                minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount),
-                maxPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount),
-                averagePacketLength(tempPacketArray, flowTable[index]->forwardPacketCount),
+                (double)minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount)/MTU_SIZE,
+                (double)maxPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount)/MTU_SIZE,
+                averagePacketLength(tempPacketArray, flowTable[index]->forwardPacketCount)/MTU_SIZE,
                 standardDeviation(tempPacketArray, flowTable[index]->forwardPacketCount),
                 minIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount),
                 maxIntervalPacketTime(tempPacketArray, flowTable[index]->forwardPacketCount),
@@ -240,12 +240,12 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
         int *binsOfBytesBackward = (int *)calloc(10, sizeof(int));
         binsOfBytesBackward = binsOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount);
         densityArray = density(tempPacketArray2, flowTable[index]->backwardPacketCount);
-        fprintf(arfFile, " %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f,%d, %d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %f, %f, %s, %s\n",
+        fprintf(arfFile, " %d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f,%d, %d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %f, %f, %s, %s\n",
                 flowTable[index]->backwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount),
-                minPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount),
-                maxPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount),
-                averagePacketLength(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                (double)minPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount)/MTU_SIZE,
+                (double)maxPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount)/MTU_SIZE,
+                averagePacketLength(tempPacketArray2, flowTable[index]->backwardPacketCount)/MTU_SIZE,
                 standardDeviation(tempPacketArray2, flowTable[index]->backwardPacketCount),
                 minIntervalPacketTime(tempPacketArray2, flowTable[index]->backwardPacketCount),
                 maxIntervalPacketTime(tempPacketArray2, flowTable[index]->backwardPacketCount),
