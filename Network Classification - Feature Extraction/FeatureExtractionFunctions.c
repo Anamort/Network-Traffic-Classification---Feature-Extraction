@@ -244,25 +244,30 @@ double averagePacketSizeToStandardDeviation(double averagePacketSize, double std
 
 int totalNumberOfACKPackets(Packet *packetArray[],int size){
     int ackCount = 0;
-    if (packetArray[0]->isTCP) {
-        
-        int i;
-        for (i = 0; i<size; i++) {
-            if (packetArray[i]->tcp_Packet.th_flags  & TH_ACK){
-                ackCount++;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_ACK){
+                    ackCount++;
+                }
             }
         }
     }
+    
     return ackCount;
 }
 
 int totalNumberOfPUSHPackets(Packet *packetArray[],int size){
     int pushCount = 0;
-    if (packetArray[0]->isTCP) {
-        int i;
-        for (i = 0; i<size; i++) {
-            if (packetArray[i]->tcp_Packet.th_flags  & TH_PUSH){
-                pushCount++;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_PUSH){
+                    pushCount++;
+                }
             }
         }
     }
@@ -289,15 +294,15 @@ double ratioOfBytesFAndB(int packetLengthF, int packetLengthB){
 
 int * binsOfBytes(Packet *packetArray[],int size){
     int *bins = calloc(10,sizeof(int));
-    
-    int i;
-    for (i=0; i<size; i++) {
-        int section = packetArray[i]->len / 150;
-        if (section > 9) {
-            section = 9;
+    if (size) {
+        int i;
+        for (i=0; i<size; i++) {
+            int section = packetArray[i]->len / 150;
+            if (section > 9) {
+                section = 9;
+            }
+            bins[section]++;
         }
-        bins[section]++;
     }
-    
     return bins;
 }
