@@ -54,35 +54,56 @@ int main(int argc, const char * argv[]) {
     
     const char *folder[26];
     
-    folder[0] = "Packets/InstantMessaging/";
-    folder[1] = "Packets/Mail/";
-    folder[2] = "Packets/Music/";
-    folder[3] = "Packets/P2P/";
+    /************Crypttech verisi ****************/
+    folder[0] = "CrypttechData/BruteForce/";
+    folder[1] = "CrypttechData/CommandInjection/";
+    folder[2] = "CrypttechData/DDos/";
+    folder[3] = "CrypttechData/Dos/";
     
-    folder[4] = "Packets/SocialMedia/";
+    folder[4] = "CrypttechData/Normal/";
     
-    folder[5] = "Packets/Video/";
+    folder[5] = "CrypttechData/PortTaramaVeExploitation/";
     
-    folder[6] = "Packets/WebBrowsing/";
+    folder[6] = "CrypttechData/SQLInjection/";
     
+    /************Crypttech verisi ****************/
+    /*
+    folder[0] = "SingleFlow/InstantMessaging/";
+    folder[1] = "SingleFlow/Mail/";
+    folder[2] = "SingleFlow/Music/";
+    folder[3] = "SingleFlow/P2P/";
+    
+    folder[4] = "SingleFlow/SocialMedia/";
+    
+    folder[5] = "SingleFlow/Video/";
+    
+    folder[6] = "SingleFlow/WebBrowsing/";
+    */
     DIR *dir;
     struct dirent *ent;
     
     for (int i=0; i<7; i++) {
         if (i==0) {
-            className = "InstantMessaging";
+            //className = "InstantMessaging";
+            className = "BruteForce";
         }else if (i==1){
-            className = "Mail";
+            //className = "Mail";
+            className = "CommandInjection";
         }else if (i==2){
-            className = "Music";
+            //className = "Music";
+            className = "DDos";
         }else if (i==3){
-            className = "P2P";
+            //className = "P2P";
+            className = "Dos";
         }else if (i==4){
-            className = "SocialMedia";
+            //className = "SocialMedia";
+            className = "Normal";
         }else if (i==5){
-            className = "VideoStream";
+            //className = "VideoStream";
+            className = "PortTaramaVeExploitation";
         }else if (i==6){
-            className = "WebBrowsing";
+            //className = "WebBrowsing";
+            className = "SQLInjection";
         }
         printf("Class Name: %s\n",className);
         
