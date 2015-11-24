@@ -12,7 +12,7 @@
 #include "Structs.h"
 #define HashSize 10013
 #define DEBUG 0
-#define ThresholdOfPacketCount 80
+#define ThresholdOfPacketCount 10
 #define TimeThreshold 1
 #define isTimeBased 0
 

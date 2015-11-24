@@ -36,6 +36,15 @@ int totalNumberOfACKPackets(Packet *packetArray[],int size);
 int totalNumberOfPUSHPackets(Packet *packetArray[],int size);
 int * binsOfBytes(Packet *packetArray[],int size);
 
+
+/* After the Tcptrace */
+int totalNumberOfPureACKPackets(Packet *packetArray[],int size);
+
+
+
+
+/* After the Tcptrace */
+
 /*
  density: gecen zamani 10 esit parcaya bolerek her parcaya kac paket düstügünü hesaplayan fonksiyon
  ancak minPacketTime ve maxPacketTime fonksiyonlarının dogru oldugundan emin olamadigim(mantiksal olarak) icin

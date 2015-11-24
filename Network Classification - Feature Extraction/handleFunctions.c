@@ -49,6 +49,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
     
     addPacketToLinkedList(newPacket, index);
     
+    totalNumberOfPureACKPackets(&newPacket, 1); //silinecek
     //time-based operation
     if (isTimeBased) {
         double passedTime = 0;
@@ -233,7 +234,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 binsOfBytesForward[0],binsOfBytesForward[1],binsOfBytesForward[2],binsOfBytesForward[3],binsOfBytesForward[4],
                 binsOfBytesForward[5],binsOfBytesForward[6],binsOfBytesForward[7],binsOfBytesForward[8],binsOfBytesForward[9]
                 );
-        
+        //totalNumberOfPureACKPackets(tempPacketArray, flowTable[index]->forwardPacketCount);
         // for backward packets
         isForward = 0;
         Packet ** tempPacketArray2 = getFixedSizedPacketsFromFlow(index, 0);
@@ -269,7 +270,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 subClass,
                 className
                 );
-        
+        //totalNumberOfPureACKPackets(tempPacketArray2, flowTable[index]->backwardPacketCount);
         //sampleCount += flowTable[index]->packetCount;
         sampleCount++;
         //sıfırlama islemleri

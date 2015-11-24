@@ -306,3 +306,30 @@ int * binsOfBytes(Packet *packetArray[],int size){
     }
     return bins;
 }
+
+
+/* After the Tcptrace */
+int totalNumberOfPureACKPackets(Packet *packetArray[],int size){
+    int pureACKcount = 0;
+    if (size) {
+        int i;
+        for (i=0; i < size; i++) {
+            int tcpHeaderSize = packetArray[i]->tcp_Packet.th_off*4;
+            int ipLength = ntohs(packetArray[i]->ip_packet.ip_len);
+            int ipHeaderLength = packetArray[i]->ip_packet.ip_hl*4;
+            int tcpPayloadsize = ipLength - ipHeaderLength - tcpHeaderSize;
+            if (!tcpPayloadsize) {
+                if ((packetArray[i]->tcp_Packet.th_flags  & TH_SYN) || (packetArray[i]->tcp_Packet.th_flags  & TH_FIN) || (packetArray[i]->tcp_Packet.th_flags  & TH_RST) == 0){
+                    pureACKcount++;
+                }
+            }
+        }
+    }
+    
+    return pureACKcount;
+}
+
+
+
+
+/* After the Tcptrace */
