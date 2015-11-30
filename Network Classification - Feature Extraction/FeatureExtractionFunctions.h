@@ -38,11 +38,24 @@ int * binsOfBytes(Packet *packetArray[],int size);
 
 
 /* After the Tcptrace */
+int totalNumberOfURGPackets(Packet *packetArray[],int size);
+int totalNumberOfECEPackets(Packet *packetArray[],int size);
+int totalNumberOfCWRPackets(Packet *packetArray[],int size);
+int totalNumberOfRSTPackets(Packet *packetArray[],int size);
+int totalNumberOfSYNPackets(Packet *packetArray[],int size);
+int totalSizeOfURGPackets(Packet *packetArray[],int size);
 int totalNumberOfPureACKPackets(Packet *packetArray[],int size);
+int optionSetCount(Packet *packetArray[],int size);
+int countOfActualDataPackets(Packet *packetArray[],int size);
+double averageWindowSize(Packet *packetArray[],int size);
+int zeroWindowCount(Packet *packetArray[],int size);
+int minWindowSize(Packet *packetArray[],int size);
+int maxWindowSize(Packet *packetArray[],int size);
 
-
-
-
+//flowBased
+int activeFlowCount();
+double averageInFlowRate(Packet *packetArray[],int size);
+double averageFlowRate();
 /* After the Tcptrace */
 
 /*

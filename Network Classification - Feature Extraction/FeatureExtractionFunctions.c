@@ -309,9 +309,99 @@ int * binsOfBytes(Packet *packetArray[],int size){
 
 
 /* After the Tcptrace */
+int totalNumberOfURGPackets(Packet *packetArray[],int size){
+    int urgCount = 0;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_URG){
+                    urgCount++;
+                }
+            }
+        }
+    }
+    return urgCount;
+}
+
+int totalNumberOfECEPackets(Packet *packetArray[],int size){
+    int eceCount = 0;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_ECE){
+                    eceCount++;
+                }
+            }
+        }
+    }
+    return eceCount;
+}
+
+int totalNumberOfCWRPackets(Packet *packetArray[],int size){
+    int cwrCount = 0;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_CWR){
+                    cwrCount++;
+                }
+            }
+        }
+    }
+    return cwrCount;
+}
+
+int totalSizeOfURGPackets(Packet *packetArray[],int size){
+    int urgSize = 0;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_URG){
+                    urgSize += ntohs(packetArray[i]->ip_packet.ip_len);
+                }
+            }
+        }
+    }
+    return urgSize;
+}
+
+int totalNumberOfRSTPackets(Packet *packetArray[],int size){
+    int rstCount = 0;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_RST){
+                    rstCount++;
+                }
+            }
+        }
+    }
+    return rstCount;
+}
+
+int totalNumberOfSYNPackets(Packet *packetArray[],int size){
+    int synCount = 0;
+    if (size) {
+        if (packetArray[0]->isTCP) {
+            int i;
+            for (i = 0; i<size; i++) {
+                if (packetArray[i]->tcp_Packet.th_flags  & TH_SYN){
+                    synCount++;
+                }
+            }
+        }
+    }
+    return synCount;
+}
+
 int totalNumberOfPureACKPackets(Packet *packetArray[],int size){
     int pureACKcount = 0;
-    if (size) {
+    if (size && packetArray[0]->isTCP) {
         int i;
         for (i=0; i < size; i++) {
             int tcpHeaderSize = packetArray[i]->tcp_Packet.th_off*4;
@@ -325,11 +415,102 @@ int totalNumberOfPureACKPackets(Packet *packetArray[],int size){
             }
         }
     }
-    
     return pureACKcount;
 }
 
+int optionSetCount(Packet *packetArray[],int size){
+    int optionCount = 0;
+    if (size && packetArray[0]->isTCP) {
+        int i;
+        for (i=0; i < size; i++) {
+            int tcpHeaderSize = packetArray[i]->tcp_Packet.th_off*4;
+            if (tcpHeaderSize > 20) {
+                optionCount++;
+            }
+        }
+    }
+    return optionCount;
+}
 
+int countOfActualDataPackets(Packet *packetArray[],int size){
+    int actualDataPackets = 0;
+    if (size && packetArray[0]->isTCP) {
+        int i;
+        for (i=0; i < size; i++) {
+            int tcpHeaderSize = packetArray[i]->tcp_Packet.th_off*4;
+            int ipLength = ntohs(packetArray[i]->ip_packet.ip_len);
+            int ipHeaderLength = packetArray[i]->ip_packet.ip_hl*4;
+            int tcpPayloadsize = ipLength - ipHeaderLength - tcpHeaderSize;
+            if (tcpPayloadsize > 0) {
+                actualDataPackets++;
+            }
+        }
+    }
+    return actualDataPackets;
+}
 
+double averageWindowSize(Packet *packetArray[],int size){
+    double windowSize = 0;
+    if (size && packetArray[0]->isTCP) {
+        int i;
+        for (i=0; i < size; i++) {
+            windowSize += ntohs(packetArray[i]->tcp_Packet.th_win);
+            }
+        }
+    return windowSize;
+}
+
+int zeroWindowCount(Packet *packetArray[],int size){
+    double zeroWindowCount = 0;
+    if (size && packetArray[0]->isTCP) {
+        int i;
+        for (i=0; i < size; i++) {
+            if (ntohs(packetArray[i]->tcp_Packet.th_win) == 0) {
+                zeroWindowCount++;
+            }
+        }
+    }
+    return zeroWindowCount;
+}
+
+int minWindowSize(Packet *packetArray[],int size){
+    int minWindowSize;
+    if (size && packetArray[0]->isTCP) {
+        minWindowSize = ntohs(packetArray[0]->tcp_Packet.th_win);
+        int i;
+        for (i=1; i < size; i++) {
+            if (ntohs(packetArray[i]->tcp_Packet.th_win) < minWindowSize) {
+                minWindowSize = ntohs(packetArray[i]->tcp_Packet.th_win);
+            }
+        }
+        return minWindowSize;
+    } else{
+        return 0; //udp packet
+    }
+}
+
+int maxWindowSize(Packet *packetArray[],int size){
+    int maxWindowSize;
+    if (size && packetArray[0]->isTCP) {
+        maxWindowSize = ntohs(packetArray[0]->tcp_Packet.th_win);
+        int i;
+        for (i=1; i < size; i++) {
+            if (ntohs(packetArray[i]->tcp_Packet.th_win) > maxWindowSize) {
+                maxWindowSize = ntohs(packetArray[i]->tcp_Packet.th_win);
+            }
+        }
+        return maxWindowSize;
+    } else{
+        return 0; //udp packet
+    }
+}
+
+int activeFlowCount(){
+    return flowCount;
+}
+
+double averageInFlowRate(Packet *packetArray[],int size){
+    return (numberOfBytes(packetArray, size) / durationForFixedPackets(packetArray, size));
+}
 
 /* After the Tcptrace */

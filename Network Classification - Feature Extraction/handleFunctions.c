@@ -49,7 +49,10 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
     
     addPacketToLinkedList(newPacket, index);
     
+    
     totalNumberOfPureACKPackets(&newPacket, 1); //silinecek
+    
+    
     //time-based operation
     if (isTimeBased) {
         double passedTime = 0;

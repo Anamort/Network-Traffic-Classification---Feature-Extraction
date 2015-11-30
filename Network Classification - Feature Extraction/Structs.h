@@ -48,6 +48,10 @@ typedef struct Flow{
     int forwardPacketCount;
     int backwardPacketCount;
     int packetCount;
+    int allPacketsCount;
+    int allByteSize;
+    Packet firstPacket;
+    Packet lastPacket;
 }Flow;
 
 Flow **flowTable;
