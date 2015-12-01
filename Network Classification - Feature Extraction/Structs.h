@@ -54,6 +54,15 @@ typedef struct Flow{
     Packet lastPacket;
 }Flow;
 
+typedef struct Connection{
+    in_addr_t sourceIP;
+    in_addr_t destIP;
+    int flowCount;
+    int * indexNumbers;
+    int index;
+}Connection;
+
+Connection **connectionTable;
 Flow **flowTable;
 char *className;
 char *subClass;
@@ -62,4 +71,7 @@ int sampleCount;
 int flowCount;
 int packetCount;
 int isForward;
+
+Packet veryFirstPacket;
+Packet veryLastPacket;
 #endif

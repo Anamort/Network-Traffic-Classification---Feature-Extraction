@@ -39,18 +39,26 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
         return; //only udp or tcp packets
     }
     
-    int index = hashAndPlace(key, HashSize, packetIP);
-    flowTable[index]->packetCount++;
     newPacket->ip_packet = *packetIP;
     packetCount++;
     newPacket->nextPacket = NULL;
     newPacket->ts = pkthdr->ts;
     newPacket->len = pkthdr->len;
+    if (packetCount == 1) {
+        veryFirstPacket = *newPacket;
+    }else{
+        veryLastPacket = *newPacket;
+    }
+    
+    int index = hashAndPlace(key, HashSize, newPacket);
+    flowTable[index]->packetCount++;
+    flowTable[index]->allPacketsCount++;
+    flowTable[index]->allByteSize += pkthdr->len;
+    flowTable[index]->lastPacket = *newPacket;
     
     addPacketToLinkedList(newPacket, index);
     
     
-    totalNumberOfPureACKPackets(&newPacket, 1); //silinecek
     
     
     //time-based operation
@@ -212,7 +220,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
             perror("fİLE ERROR");
         }
         isForward = 1;
-        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,",
+        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %d, %f",
                 flowTable[index]->forwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount),
                 (double)minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount)/MTU_SIZE,
@@ -235,7 +243,22 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 totalNumberOfACKPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
                 totalNumberOfPUSHPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
                 binsOfBytesForward[0],binsOfBytesForward[1],binsOfBytesForward[2],binsOfBytesForward[3],binsOfBytesForward[4],
-                binsOfBytesForward[5],binsOfBytesForward[6],binsOfBytesForward[7],binsOfBytesForward[8],binsOfBytesForward[9]
+                binsOfBytesForward[5],binsOfBytesForward[6],binsOfBytesForward[7],binsOfBytesForward[8],binsOfBytesForward[9],
+                totalNumberOfURGPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                totalNumberOfECEPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                totalNumberOfCWRPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                totalNumberOfRSTPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                totalNumberOfSYNPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                totalSizeOfURGPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                totalNumberOfPureACKPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                optionSetCount(tempPacketArray, flowTable[index]->forwardPacketCount),
+                countOfActualDataPackets(tempPacketArray, flowTable[index]->forwardPacketCount),
+                averageWindowSize(tempPacketArray, flowTable[index]->forwardPacketCount),
+                zeroWindowCount(tempPacketArray, flowTable[index]->forwardPacketCount),
+                minWindowSize(tempPacketArray, flowTable[index]->forwardPacketCount),
+                maxWindowSize(tempPacketArray, flowTable[index]->forwardPacketCount),
+                activeFlowCount(),
+                averageInFlowRate(tempPacketArray, flowTable[index]->forwardPacketCount)
                 );
         //totalNumberOfPureACKPackets(tempPacketArray, flowTable[index]->forwardPacketCount);
         // for backward packets
@@ -244,7 +267,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
         int *binsOfBytesBackward = (int *)calloc(10, sizeof(int));
         binsOfBytesBackward = binsOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount);
         densityArray = density(tempPacketArray2, flowTable[index]->backwardPacketCount);
-        fprintf(arfFile, " %d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f,%d, %d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %f, %f, %s, %s\n",
+        fprintf(arfFile, " %d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f,%d, %d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %f, %f, %f, %f, %d, %s, %s\n",
                 flowTable[index]->backwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount),
                 (double)minPacketLength(tempPacketArray2,flowTable[index]->backwardPacketCount)/MTU_SIZE,
@@ -270,6 +293,24 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
                 binsOfBytesBackward[5],binsOfBytesBackward[6],binsOfBytesBackward[7],binsOfBytesBackward[8],binsOfBytesBackward[9],
                 ratioOfForwardAndBackwardPacketCounts(flowTable[index]->forwardPacketCount, flowTable[index]->backwardPacketCount),
                 ratioOfBytesFAndB(numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount), numberOfBytes(tempPacketArray2, flowTable[index]->backwardPacketCount)),
+                totalNumberOfURGPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                totalNumberOfECEPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                totalNumberOfCWRPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                totalNumberOfRSTPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                totalNumberOfSYNPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                totalSizeOfURGPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                totalNumberOfPureACKPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                optionSetCount(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                countOfActualDataPackets(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                averageWindowSize(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                zeroWindowCount(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                minWindowSize(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                maxWindowSize(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                averageInFlowRate(tempPacketArray2, flowTable[index]->backwardPacketCount),
+                averageFlowRate(flowTable[index]),
+                ratioOfAllPacketCounts(flowTable[index]),
+                ratioOfOpenFlows(),
+                flowCountForConnection(flowTable[index]),
                 subClass,
                 className
                 );
@@ -391,7 +432,7 @@ unsigned calculateKeyUDP (struct ip ipPacket, struct udphdr udpHeader){
     return key;
 }
 
-int hashAndPlace (unsigned key, int tableSize, struct ip * packetIP){
+int hashAndPlace (unsigned key, int tableSize, Packet * newPacket){
     int index;
     Flow *flow = (Flow *)malloc(sizeof(Flow));
     
@@ -409,8 +450,10 @@ int hashAndPlace (unsigned key, int tableSize, struct ip * packetIP){
     }
     if (i==index && flowTable[i]==NULL) { //mevcut hashtable index'i tamamen bos ise (dolayisiyla bu akisin ilk paketi oluyor) ve collusion yoksa
         flow->key = key;
-        flow->sourceIP = packetIP->ip_src.s_addr; //to assess forward and backward packets
+        flow->sourceIP = newPacket->ip_packet.ip_src.s_addr; //to assess forward and backward packets
+        flow->firstPacket = *newPacket;
         flowTable[index] = flow;
+        addToConnection(newPacket, index);
         flowCount++; //debug
         return index;
         
@@ -418,8 +461,10 @@ int hashAndPlace (unsigned key, int tableSize, struct ip * packetIP){
     //tekrarlamisim sanki?
     else if (i!=index && flowTable[i] == NULL) { // mevcut hashtable index'i tamamen bos ise (dolayisiyla bu akisin ilk paketi oluyor) ve collusion varsa
         flow->key = key;
-        flow->sourceIP = packetIP->ip_src.s_addr;
+        flow->sourceIP = newPacket->ip_packet.ip_src.s_addr;
+        flow->firstPacket = *newPacket;
         flowTable[i] = flow;
+        addToConnection(newPacket, index);
         flowCount++; //debug
         return i;
     }else{
@@ -546,4 +591,53 @@ void deallocFlowtable(){
     free(flowTable);
     flowTable = NULL;
     //flowTable = NULL;
+}
+
+void allocConnectionTable(){
+    connectionTable = (Connection **)malloc(sizeof(Connection)*HashSize);
+    for (int i = 0; i<HashSize; i++) {
+        connectionTable[i] = (Connection *)malloc(sizeof(Connection));
+        connectionTable[i] = NULL;
+    }
+}
+
+void deallocConnectionTable(){
+    for (int i = 0; i<HashSize; i++) {
+        //free(connectionTable[i]->indexNumbers);
+        //connectionTable[i]->indexNumbers = NULL;
+        free(connectionTable[i]);
+        connectionTable[i] = NULL;
+    }
+    free(connectionTable);
+    connectionTable = NULL;
+}
+
+void addToConnection(Packet *newPacket, int index){
+    unsigned key;
+    key = newPacket->ip_packet.ip_src.s_addr / 313;
+    key += newPacket->ip_packet.ip_dst.s_addr / 313;
+    int connectionIndex = key % HashSize;
+    //Connection debugConnection = *connectionTable[connectionIndex];
+        int found = 0;
+        while (connectionTable[connectionIndex] != NULL && found == 0) {
+            if ((connectionTable[connectionIndex]->sourceIP == newPacket->ip_packet.ip_src.s_addr && connectionTable[connectionIndex]->destIP == newPacket->ip_packet.ip_dst.s_addr) || (connectionTable[connectionIndex]->destIP == newPacket->ip_packet.ip_src.s_addr && connectionTable[connectionIndex]->sourceIP == newPacket->ip_packet.ip_dst.s_addr)){
+                found = 1;
+            }else{
+                connectionIndex++;
+            }
+        }
+        if (found) { //mevcut connection var ise
+            connectionTable[connectionIndex]->flowCount++;
+            connectionTable[connectionIndex]->indexNumbers[connectionTable[connectionIndex]->index] = index;
+            connectionTable[connectionIndex]->index++;
+        }else{ //null ise
+            Connection *newConnection = (Connection *)malloc(sizeof(Connection));
+            newConnection->sourceIP = newPacket->ip_packet.ip_src.s_addr;
+            newConnection->destIP = newPacket->ip_packet.ip_dst.s_addr;
+            newConnection->indexNumbers = calloc(100000, sizeof(int));
+            newConnection->indexNumbers[0] = index;
+            newConnection->index = 1; //bos gozu gosteriyor
+            newConnection->flowCount = 1;
+            connectionTable[connectionIndex] = newConnection;
+        }
 }

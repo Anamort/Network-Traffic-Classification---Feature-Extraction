@@ -28,7 +28,7 @@ unsigned calculateKeyTCP (struct ip ipPacket, struct tcphdr tcpHeader);
 unsigned calculateKeyUDP (struct ip ipPacket, struct udphdr udpHeader);
 
 // yeni gelen paketin hashtable'daki hangi flow'a ait oldugunu belirtip index'i donduren ve flow'u initilize edip hashtable'a yerlestiren fonksiyon
-int hashAndPlace (unsigned key, int tableSize, struct ip *);
+int hashAndPlace (unsigned key, int tableSize, Packet *);
 
 //gelen paketin ileri ya da geri yonlu olduguna karar verilip ilgili flow'un linkli listesine (forward ya da backward) yerlestirilmesi
 void addPacketToLinkedList (Packet *, int index);
@@ -47,7 +47,10 @@ void deleteLinkedList (Packet **head);
 //mevcut dosyadan altbasligi cikartan fonksiyon
 char * extractSubclassName(char *pcapFile);
 
+void addToConnection(Packet *newPacket, int index);
+
 void allocFlowtable();
 void deallocFlowtable();
-
+void allocConnectionTable();
+void deallocConnectionTable();
 #endif /* defined(__Network_Classification___Feature_Extraction__handleFunctions__) */

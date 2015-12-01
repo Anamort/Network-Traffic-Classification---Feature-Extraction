@@ -54,8 +54,11 @@ int maxWindowSize(Packet *packetArray[],int size);
 
 //flowBased
 int activeFlowCount();
-double averageInFlowRate(Packet *packetArray[],int size);
-double averageFlowRate();
+double averageInFlowRate(Packet *packetArray[],int size);//ilgili flow'un threshold paket sayısından hesaplanıyor
+double averageFlowRate(Flow *flow); //ilgili flow'un gelen tüm byte degerlerinden hesaplanıyor
+double ratioOfAllPacketCounts(Flow *flow); //ilgili flow'un gelen tüm paket sayısından hesaplanıyor
+double ratioOfOpenFlows();
+int flowCountForConnection(Flow *flow);
 /* After the Tcptrace */
 
 /*

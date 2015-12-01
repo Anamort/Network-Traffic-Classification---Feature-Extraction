@@ -510,7 +510,70 @@ int activeFlowCount(){
 }
 
 double averageInFlowRate(Packet *packetArray[],int size){
-    return (numberOfBytes(packetArray, size) / durationForFixedPackets(packetArray, size));
+    if (size) {
+        return (numberOfBytes(packetArray, size) / durationForFixedPackets(packetArray, size));
+    }else{
+        return 0;
+    }
+    
 }
 
+double averageFlowRate(Flow *flow){
+    double flowRate;
+    double elapsedTime = 0.0;
+    long double firstPacket = flow->firstPacket.ts.tv_sec + (flow->firstPacket.ts.tv_usec*pow(10.0, -6));
+    long double secondPacket = flow->lastPacket.ts.tv_sec + (flow->lastPacket.ts.tv_usec*pow(10.0, -6));
+    
+    elapsedTime = secondPacket - firstPacket;
+    flowRate = flow->allByteSize / elapsedTime;
+    
+    return flowRate;
+}
+
+double ratioOfAllPacketCounts(Flow *flow){
+    double ratio;
+    
+    double elapsedTime = 0.0;
+    long double firstPacket = flow->firstPacket.ts.tv_sec + (flow->firstPacket.ts.tv_usec*pow(10.0, -6));
+    long double secondPacket = flow->lastPacket.ts.tv_sec + (flow->lastPacket.ts.tv_usec*pow(10.0, -6));
+    
+    elapsedTime = secondPacket - firstPacket;
+    
+    ratio = flow->allPacketsCount / elapsedTime;
+    
+    return ratio;
+}
+
+double ratioOfOpenFlows(){
+    double ratio;
+    
+    double elapsedTime = 0.0;
+    long double firstPacket = veryFirstPacket.ts.tv_sec + (veryFirstPacket.ts.tv_usec*pow(10.0, -6));
+    long double secondPacket = veryLastPacket.ts.tv_sec + (veryLastPacket.ts.tv_usec*pow(10.0, -6));
+    
+    elapsedTime = secondPacket - firstPacket;
+    ratio = flowCount / elapsedTime;
+    
+    return ratio;
+}
+
+int flowCountForConnection(Flow *flow){
+    unsigned key;
+    key = flow->sourceIP / 313;
+    key += flow->firstPacket.ip_packet.ip_dst.s_addr / 313;
+    int connectionIndex = key % HashSize;
+    int found = 0;
+    while (connectionTable[connectionIndex] != NULL && found == 0) {
+        if ((connectionTable[connectionIndex]->sourceIP == flow->sourceIP && connectionTable[connectionIndex]->destIP == flow->firstPacket.ip_packet.ip_dst.s_addr) || (connectionTable[connectionIndex]->destIP == flow->sourceIP && connectionTable[connectionIndex]->sourceIP == flow->firstPacket.ip_packet.ip_dst.s_addr)){
+            found = 1;
+        }else{
+            connectionIndex++;
+        }
+    }
+    if (!found) {
+        perror("olmamali");
+    }
+    
+    return connectionTable[connectionIndex]->flowCount;
+}
 /* After the Tcptrace */

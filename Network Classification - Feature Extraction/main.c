@@ -117,7 +117,7 @@ int main(int argc, const char * argv[]) {
                     strcat(absolutePath, folder[i]);
                     strcat(absolutePath, ent->d_name);
                     allocFlowtable();
-                    
+                    allocConnectionTable();
                     printf("Absolute path: %s\n",absolutePath);
                     sshPcapFile = fopen(absolutePath, "r");
                     if (sshPcapFile == NULL) {
@@ -136,6 +136,7 @@ int main(int argc, const char * argv[]) {
                     packetCount = 0;
                     //hashTable sifirlanacak
                     deallocFlowtable();
+                    deallocConnectionTable();
                     absolutePath = NULL;
                     free(absolutePath);
                     
