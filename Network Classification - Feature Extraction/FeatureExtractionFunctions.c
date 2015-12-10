@@ -511,7 +511,12 @@ int activeFlowCount(){
 
 double averageInFlowRate(Packet *packetArray[],int size){
     if (size) {
-        return (numberOfBytes(packetArray, size) / durationForFixedPackets(packetArray, size));
+        if (durationForFixedPackets(packetArray, size) == 0) {
+            return 0;
+        }else{
+            return (numberOfBytes(packetArray, size) / durationForFixedPackets(packetArray, size));
+        }
+        
     }else{
         return 0;
     }
@@ -525,6 +530,10 @@ double averageFlowRate(Flow *flow){
     long double secondPacket = flow->lastPacket.ts.tv_sec + (flow->lastPacket.ts.tv_usec*pow(10.0, -6));
     
     elapsedTime = secondPacket - firstPacket;
+    if (elapsedTime == 0) {
+        return 0;
+    }
+    
     flowRate = flow->allByteSize / elapsedTime;
     
     return flowRate;

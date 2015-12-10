@@ -603,10 +603,19 @@ void allocConnectionTable(){
 
 void deallocConnectionTable(){
     for (int i = 0; i<HashSize; i++) {
-        //free(connectionTable[i]->indexNumbers);
-        //connectionTable[i]->indexNumbers = NULL;
+        
+        if (connectionTable[i] != NULL) {
+            connectionTable[i]->flowCount = NULL;
+            connectionTable[i]->destIP = NULL;
+            connectionTable[i]->sourceIP = NULL;
+            connectionTable[i]->index = NULL;
+            free(connectionTable[i]->indexNumbers);
+            connectionTable[i]->indexNumbers = NULL;
+        }
+        
         free(connectionTable[i]);
         connectionTable[i] = NULL;
+        
     }
     free(connectionTable);
     connectionTable = NULL;

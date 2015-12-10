@@ -55,6 +55,7 @@ int main(int argc, const char * argv[]) {
     const char *folder[26];
     
     /************Crypttech verisi ****************/
+    /*
     folder[0] = "CrypttechData/BruteForce/";
     folder[1] = "CrypttechData/CommandInjection/";
     folder[2] = "CrypttechData/DDos/";
@@ -65,8 +66,9 @@ int main(int argc, const char * argv[]) {
     folder[5] = "CrypttechData/PortTaramaVeExploitation/";
     
     folder[6] = "CrypttechData/SQLInjection/";
-    
+    */
     /************Crypttech verisi ****************/
+    
     /*
     folder[0] = "SingleFlow/InstantMessaging/";
     folder[1] = "SingleFlow/Mail/";
@@ -79,31 +81,46 @@ int main(int argc, const char * argv[]) {
     
     folder[6] = "SingleFlow/WebBrowsing/";
     */
+    
+    
+     folder[0] = "Packets/InstantMessaging/";
+     folder[1] = "Packets/Mail/";
+     folder[2] = "Packets/Music/";
+     folder[3] = "Packets/P2P/";
+     
+     folder[4] = "Packets/SocialMedia/";
+     
+     folder[5] = "Packets/Video/";
+     
+     folder[6] = "Packets/WebBrowsing/";
+     
+    
+    
     DIR *dir;
     struct dirent *ent;
     
     for (int i=0; i<7; i++) {
         if (i==0) {
-            //className = "InstantMessaging";
-            className = "BruteForce";
+            className = "InstantMessaging";
+            //className = "BruteForce";
         }else if (i==1){
-            //className = "Mail";
-            className = "CommandInjection";
+            className = "Mail";
+            //className = "CommandInjection";
         }else if (i==2){
-            //className = "Music";
-            className = "DDos";
+            className = "Music";
+            //className = "DDos";
         }else if (i==3){
-            //className = "P2P";
-            className = "Dos";
+            className = "P2P";
+            //className = "Dos";
         }else if (i==4){
-            //className = "SocialMedia";
-            className = "Normal";
+            className = "SocialMedia";
+            //className = "Normal";
         }else if (i==5){
-            //className = "VideoStream";
-            className = "PortTaramaVeExploitation";
+            className = "VideoStream";
+            //className = "PortTaramaVeExploitation";
         }else if (i==6){
-            //className = "WebBrowsing";
-            className = "SQLInjection";
+            className = "WebBrowsing";
+            //className = "SQLInjection";
         }
         printf("Class Name: %s\n",className);
         
