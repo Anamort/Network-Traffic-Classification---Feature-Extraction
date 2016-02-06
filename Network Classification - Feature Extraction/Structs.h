@@ -74,4 +74,5 @@ int isForward;
 
 Packet veryFirstPacket;
 Packet veryLastPacket;
+int indexOfTheFlow;
 #endif

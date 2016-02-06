@@ -83,6 +83,8 @@ int main(int argc, const char * argv[]) {
     */
     
     
+    /*
+    
      folder[0] = "Packets/InstantMessaging/";
      folder[1] = "Packets/Mail/";
      folder[2] = "Packets/Music/";
@@ -94,12 +96,33 @@ int main(int argc, const char * argv[]) {
      
      folder[6] = "Packets/WebBrowsing/";
      
+    */
+    /*
+    folder[0] = "SingleFlow/InstantMessaging/";
+    folder[1] = "SingleFlow/Mail/";
+    folder[2] = "SingleFlow/Music/";
+    folder[3] = "SingleFlow/P2P/";
     
+    folder[4] = "SingleFlow/SocialMedia/";
+    
+    folder[5] = "SingleFlow/Video/";
+    
+    folder[6] = "SingleFlow/WebBrowsing/";
+    */
+    folder[0] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/FileTransfer/";
+    folder[1] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/InstantMessaging/";
+    folder[2] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/Mail/";
+    folder[3] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/P2P/";
+    
+    folder[4] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/Streaming/";
+    
+    folder[5] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/VoIP/";
     
     DIR *dir;
     struct dirent *ent;
     
-    for (int i=0; i<7; i++) {
+    for (int i=0; i<6; i++) {
+        /*
         if (i==0) {
             className = "InstantMessaging";
             //className = "BruteForce";
@@ -121,6 +144,25 @@ int main(int argc, const char * argv[]) {
         }else if (i==6){
             className = "WebBrowsing";
             //className = "SQLInjection";
+        }
+         */
+        if (i==0) {
+            className = "FileTransfer";
+        }else if (i==1){
+            className = "InstantMessaging";
+            //className = "CommandInjection";
+        }else if (i==2){
+            className = "Mail";
+            //className = "DDos";
+        }else if (i==3){
+            className = "P2P";
+            //className = "Dos";
+        }else if (i==4){
+            className = "Streaming";
+            //className = "Normal";
+        }else if (i==5){
+            className = "VoIP";
+            //className = "PortTaramaVeExploitation";
         }
         printf("Class Name: %s\n",className);
         
@@ -149,6 +191,17 @@ int main(int argc, const char * argv[]) {
                     printf("Sample Count: %d\n\n",sampleCount);
                     //sampleCount = 0;
                     printf("Flow Count: %d\n\n",flowCount);
+                    printf("Packet Count: %d\n\n",packetCount);
+                    
+                    //olmadi dongu icerisinde tum flowları dolas
+                    //getFeaturesFromFlow(indexOfTheFlow);
+                    
+                    for (int index=0; index<HashSize; index++) {
+                        if (flowTable[index]!=NULL) {
+                            getFeaturesFromFlow(index);
+                        }
+                    }
+                    
                     flowCount = 0;
                     packetCount = 0;
                     //hashTable sifirlanacak
