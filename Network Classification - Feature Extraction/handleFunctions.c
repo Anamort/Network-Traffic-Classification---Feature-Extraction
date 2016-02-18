@@ -52,9 +52,11 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
     
     int index = hashAndPlace(key, HashSize, newPacket);
     flowTable[index]->packetCount++;
+    newPacket->packetNumber = flowTable[index]->packetCount;
     flowTable[index]->allPacketsCount++;
     flowTable[index]->allByteSize += pkthdr->len;
     flowTable[index]->lastPacket = *newPacket;
+    
     
     addPacketToLinkedList(newPacket, index);
     
@@ -220,7 +222,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
             perror("fİLE ERROR");
         }
         isForward = 1;
-        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %d, %f",
+        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %d, %f,",
                 flowTable[index]->forwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount),
                 (double)minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount)/MTU_SIZE,
@@ -376,7 +378,7 @@ void handleIP (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packe
 }
 
 void getFeaturesFromFlow(int index){
-    {
+    
         //feature extraction for fixed packet count
         // for forward packets
         //printf("Packet Count: %d \n",flowTable[index]->packetCount);//debug
@@ -397,7 +399,7 @@ void getFeaturesFromFlow(int index){
         }else if(flowTable[index]->forwardPackets != 0){
             protocol = flowTable[index]->forwardPackets[0].ip_packet.ip_p;
         }
-        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %d, %f",
+        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %d, %f,",
                 flowTable[index]->forwardPacketCount, //number of packets
                 numberOfBytes(tempPacketArray, flowTable[index]->forwardPacketCount),
                 (double)minPacketLength(tempPacketArray,flowTable[index]->forwardPacketCount)/MTU_SIZE,
@@ -512,6 +514,289 @@ void getFeaturesFromFlow(int index){
         free(densityArray);
         free(binsOfBytesForward);
         free(binsOfBytesBackward);
+    
+}
+
+void getSubFlowFromActualFlow(int index) {
+    Packet **forwardPackets = (Packet **)malloc(ThresholdOfPacketCount* sizeof(Packet *));
+    Packet **backwardPackets = (Packet **)malloc(ThresholdOfPacketCount* sizeof(Packet *));
+    //Packet **allForwardPacketArray = NULL, **allBackwardPacketArray = NULL;
+    
+    Packet **allForwardPacketArray = getFixedSizedPacketsFromFlow(index, 1);
+    Packet **allBackwardPacketArray = getFixedSizedPacketsFromFlow(index, 0);
+    
+    if (flowTable[index]->packetCount >= ThresholdOfPacketCount){
+        int i = 0;
+        int j = 0;
+        int count = 0;
+        int indexForward = 0;
+        int indexBackward = 0;
+        
+        if (location == 0) {
+            i = 0;
+            j = 0;
+            count = 0;
+            indexForward = 0;
+            indexBackward = 0;
+        }
+        else if (location == 1){
+            int middleOfFlow = flowTable[index]->packetCount / 2;
+            count = 0;
+            int indexCount = 0;
+            int packetNumber = 0;
+            while (indexCount < flowTable[index]->forwardPacketCount && packetNumber < middleOfFlow) {
+                //to be continued
+                packetNumber = allForwardPacketArray[indexCount]->packetNumber;
+                indexCount++;
+                
+            }
+            if (indexCount < flowTable[index]->forwardPacketCount ) {
+                indexForward = indexCount;
+            }else{
+                indexForward = flowTable[index]->forwardPacketCount + 2; //hic girmesin buna
+            }
+            
+            //indexForward = middleOfFlow;
+            //indexBackward = middleOfFlow;
+            
+            indexCount = 0;
+            packetNumber = 0;
+            while (indexCount < flowTable[index]->backwardPacketCount && packetNumber < middleOfFlow) {
+                //to be continued
+                packetNumber = allBackwardPacketArray[indexCount]->packetNumber;
+                indexCount++;
+                
+            }
+            if (indexCount < flowTable[index]->backwardPacketCount ) {
+                indexBackward = indexCount;
+            }else{
+                indexBackward = flowTable[index]->backwardPacketCount + 2; //hic girmesin buna
+            }
+            
+            
+        }
+        else if (location == 2){
+            int endOfTheFlow = flowTable[index]->packetCount - ThresholdOfPacketCount;
+            count = 0;
+            int indexCount = 0;
+            int packetNumber = 0;
+            while (indexCount < flowTable[index]->forwardPacketCount && packetNumber < endOfTheFlow) {
+                //to be continued
+                packetNumber = allForwardPacketArray[indexCount]->packetNumber;
+                indexCount++;
+                
+            }
+            if (indexCount < flowTable[index]->forwardPacketCount ) {
+                indexForward = indexCount;
+            }else{
+                indexForward = flowTable[index]->forwardPacketCount + 2; //hic girmesin buna
+            }
+            
+            //indexForward = middleOfFlow;
+            //indexBackward = middleOfFlow;
+            
+            indexCount = 0;
+            packetNumber = 0;
+            while (indexCount < flowTable[index]->backwardPacketCount && packetNumber < endOfTheFlow) {
+                //to be continued
+                packetNumber = allBackwardPacketArray[indexCount]->packetNumber;
+                indexCount++;
+                
+            }
+            if (indexCount < flowTable[index]->backwardPacketCount ) {
+                indexBackward = indexCount;
+            }else{
+                indexBackward = flowTable[index]->backwardPacketCount + 2; //hic girmesin buna
+            }
+        }
+    
+        while (count < ThresholdOfPacketCount && (indexForward < flowTable[index]->forwardPacketCount) && (indexBackward < flowTable[index]->backwardPacketCount)) {
+            if (allForwardPacketArray[indexForward]->ts.tv_sec != allBackwardPacketArray[indexBackward]->ts.tv_sec) {
+                if (allForwardPacketArray[indexForward]->ts.tv_sec > allBackwardPacketArray[indexBackward]->ts.tv_sec) {
+                    backwardPackets[i] = (Packet *)malloc(sizeof(Packet));
+                    backwardPackets[i] = allBackwardPacketArray[indexBackward];
+                    i++;
+                    indexBackward++;
+                }else{
+                    forwardPackets[j] = (Packet *)malloc(sizeof(Packet));
+                    forwardPackets[j] = allForwardPacketArray[indexForward];
+                    j++;
+                    indexForward++;
+                }
+            }
+            else if (allForwardPacketArray[j]->ts.tv_usec > allBackwardPacketArray[i]->ts.tv_usec){
+                backwardPackets[i] = (Packet *)malloc(sizeof(Packet));
+                backwardPackets[i] = allBackwardPacketArray[indexBackward];
+                i++;
+                indexBackward++;
+            }else{
+                forwardPackets[j] = (Packet *)malloc(sizeof(Packet));
+                forwardPackets[j] = allForwardPacketArray[indexForward];
+                j++;
+                indexForward++;
+            }
+            count++;
+        }
+        
+        if (count < ThresholdOfPacketCount) {
+            if (indexBackward < flowTable[index]->backwardPacketCount) {
+                while (count < ThresholdOfPacketCount && (indexBackward < flowTable[index]->backwardPacketCount)) {
+                    backwardPackets[i] = (Packet *)malloc(sizeof(Packet));
+                    backwardPackets[i] = allBackwardPacketArray[indexBackward];
+                    i++;
+                    count++;
+                    indexBackward++;
+                }
+            }else{
+                while (count < ThresholdOfPacketCount && (indexForward < flowTable[index]->forwardPacketCount)) {
+                    forwardPackets[j] = (Packet *)malloc(sizeof(Packet));
+                    forwardPackets[j] = allForwardPacketArray[indexForward];
+                    j++;
+                    count++;
+                    indexForward++;
+                }
+            }
+        }
+        
+        
+        //feature extraction for fixed packet count
+        // for forward packets
+        //printf("Packet Count: %d \n",flowTable[index]->packetCount);//debug
+        int *densityArray = (int *)calloc(10, sizeof(int));
+        densityArray = density(forwardPackets, j);
+        int *binsOfBytesForward = (int *)calloc(10, sizeof(int));
+        binsOfBytesForward = binsOfBytes(forwardPackets, j);
+        FILE *arfFile;
+        arfFile = fopen("fixedSize.txt","a");
+        if (arfFile == NULL) {
+            perror("fİLE ERROR");
+        }
+        isForward = 1;
+        int protocol;
+        if (flowTable[index]->backwardPacketCount != 0) {
+            protocol = flowTable[index]->backwardPackets[0].ip_packet.ip_p;
+        }else if(flowTable[index]->forwardPackets != 0){
+            protocol = flowTable[index]->forwardPackets[0].ip_packet.ip_p;
+        }
+        fprintf(arfFile, "%d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,%f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %d, %f,",
+                j, //number of packets
+                numberOfBytes(forwardPackets, j),
+                (double)minPacketLength(forwardPackets,j)/MTU_SIZE,
+                (double)maxPacketLength(forwardPackets,j)/MTU_SIZE,
+                averagePacketLength(forwardPackets, j)/MTU_SIZE,
+                standardDeviation(forwardPackets, j),
+                minIntervalPacketTime(forwardPackets, j),
+                maxIntervalPacketTime(forwardPackets, j),
+                averageIntervalPacketTime(forwardPackets, j),
+                standardDeviationOfIntervalPacketTime(forwardPackets, j),
+                durationForFixedPackets(forwardPackets, j),
+                protocol, //protocol
+                densityArray[0],densityArray[1],densityArray[2],densityArray[3],densityArray[4],
+                densityArray[5],densityArray[6],densityArray[7],densityArray[8],densityArray[9],
+                numberOfBytesToPacketCount(numberOfBytes(forwardPackets, j), j),
+                minIntervalvsPacketCount(minIntervalPacketTime(forwardPackets, j), j),
+                maxIntervalvsPacketCount(maxIntervalPacketTime(forwardPackets, j), j),
+                maxPacketSizeToStandardDeviation(maxPacketLength(forwardPackets, j), standardDeviation(forwardPackets, j)),
+                averagePacketSizeToStandardDeviation(averagePacketLength(forwardPackets, j), standardDeviationOfIntervalPacketTime(forwardPackets, j)),
+                totalNumberOfACKPackets(forwardPackets, j),
+                totalNumberOfPUSHPackets(forwardPackets, j),
+                binsOfBytesForward[0],binsOfBytesForward[1],binsOfBytesForward[2],binsOfBytesForward[3],binsOfBytesForward[4],
+                binsOfBytesForward[5],binsOfBytesForward[6],binsOfBytesForward[7],binsOfBytesForward[8],binsOfBytesForward[9],
+                totalNumberOfURGPackets(forwardPackets, j),
+                totalNumberOfECEPackets(forwardPackets, j),
+                totalNumberOfCWRPackets(forwardPackets, j),
+                totalNumberOfRSTPackets(forwardPackets, j),
+                totalNumberOfSYNPackets(forwardPackets, j),
+                totalSizeOfURGPackets(forwardPackets, j),
+                totalNumberOfPureACKPackets(forwardPackets, j),
+                optionSetCount(forwardPackets, j),
+                countOfActualDataPackets(forwardPackets, j),
+                averageWindowSize(forwardPackets, j),
+                zeroWindowCount(forwardPackets, j),
+                minWindowSize(forwardPackets, j),
+                maxWindowSize(forwardPackets, j),
+                activeFlowCount(),
+                averageInFlowRate(forwardPackets, j)
+                );
+        //totalNumberOfPureACKPackets(tempPacketArray, flowTable[index]->forwardPacketCount);
+        // for backward packets
+        isForward = 0;
+        //Packet ** tempPacketArray2 = getFixedSizedPacketsFromFlow(index, 0);
+        int *binsOfBytesBackward = (int *)calloc(10, sizeof(int));
+        binsOfBytesBackward = binsOfBytes(backwardPackets, i);
+        densityArray = density(backwardPackets, i);
+        fprintf(arfFile, " %d, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f,%d, %d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %f, %f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %d, %d, %d, %f, %f, %f, %f, %d, %s, %s\n",
+                i, //number of packets
+                numberOfBytes(backwardPackets, i),
+                (double)minPacketLength(backwardPackets, i)/MTU_SIZE,
+                (double)maxPacketLength(backwardPackets, i)/MTU_SIZE,
+                averagePacketLength(backwardPackets, i)/MTU_SIZE,
+                standardDeviation(backwardPackets, i),
+                minIntervalPacketTime(backwardPackets, i),
+                maxIntervalPacketTime(backwardPackets, i),
+                averageIntervalPacketTime(backwardPackets, i),
+                standardDeviationOfIntervalPacketTime(backwardPackets, i),
+                durationForFixedPackets(backwardPackets, i),
+                protocol, //protocol
+                densityArray[0],densityArray[1],densityArray[2],densityArray[3],densityArray[4],
+                densityArray[5],densityArray[6],densityArray[7],densityArray[8],densityArray[9],
+                numberOfBytesToPacketCount(numberOfBytes(backwardPackets, i), i),
+                minIntervalvsPacketCount(minIntervalPacketTime(backwardPackets, i), i),
+                maxIntervalvsPacketCount(maxIntervalPacketTime(backwardPackets, i), i),
+                maxPacketSizeToStandardDeviation(maxPacketLength(backwardPackets, i), standardDeviation(backwardPackets, i)),
+                averagePacketSizeToStandardDeviation(averagePacketLength(backwardPackets, i), standardDeviationOfIntervalPacketTime(backwardPackets, i)),
+                totalNumberOfACKPackets(backwardPackets, i),
+                totalNumberOfPUSHPackets(backwardPackets, i),
+                binsOfBytesBackward[0],binsOfBytesBackward[1],binsOfBytesBackward[2],binsOfBytesBackward[3],binsOfBytesBackward[4],
+                binsOfBytesBackward[5],binsOfBytesBackward[6],binsOfBytesBackward[7],binsOfBytesBackward[8],binsOfBytesBackward[9],
+                ratioOfForwardAndBackwardPacketCounts(j, i),
+                ratioOfBytesFAndB(numberOfBytes(forwardPackets, j), numberOfBytes(backwardPackets, i)),
+                totalNumberOfURGPackets(backwardPackets, i),
+                totalNumberOfECEPackets(backwardPackets, i),
+                totalNumberOfCWRPackets(backwardPackets, i),
+                totalNumberOfRSTPackets(backwardPackets, i),
+                totalNumberOfSYNPackets(backwardPackets, i),
+                totalSizeOfURGPackets(backwardPackets, i),
+                totalNumberOfPureACKPackets(backwardPackets, i),
+                optionSetCount(backwardPackets, i),
+                countOfActualDataPackets(backwardPackets, i),
+                averageWindowSize(backwardPackets, i),
+                zeroWindowCount(backwardPackets, i),
+                minWindowSize(backwardPackets, i),
+                maxWindowSize(backwardPackets, i),
+                averageInFlowRate(backwardPackets, i),
+                averageFlowRate(flowTable[index]),
+                ratioOfAllPacketCounts(flowTable[index]),
+                ratioOfOpenFlows(),
+                flowCountForConnection(flowTable[index]),
+                subClass,
+                className
+                );
+        //totalNumberOfPureACKPackets(tempPacketArray2, flowTable[index]->backwardPacketCount);
+        //sampleCount += flowTable[index]->packetCount;
+        sampleCount++;
+        //sıfırlama islemleri
+        flowTable[index]->packetCount = 0;
+        if (flowTable[index]->forwardPacketCount != 0) {
+            deleteLinkedList(&flowTable[index]->forwardPackets);
+        }
+        if (flowTable[index]->backwardPacketCount != 0) {
+            deleteLinkedList(&flowTable[index]->backwardPackets);
+        }
+        flowTable[index]->forwardPackets = NULL;
+        flowTable[index]->backwardPackets = NULL;
+        flowTable[index]->forwardPacketCount = 0;
+        flowTable[index]->backwardPacketCount = 0;
+        
+        
+        fclose(arfFile);
+        free(densityArray);
+        free(binsOfBytesForward);
+        free(binsOfBytesBackward);
+        
+    }
+    else{
+        getFeaturesFromFlow(index);
     }
 }
 

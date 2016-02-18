@@ -35,6 +35,7 @@ typedef struct Packet{
     struct timeval ts;
     u_int len;
     int isTCP;
+    int packetNumber;
     struct Packet *nextPacket;
 }Packet;
 

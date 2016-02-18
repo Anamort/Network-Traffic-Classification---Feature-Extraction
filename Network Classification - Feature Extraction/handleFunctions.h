@@ -12,10 +12,12 @@
 #include "Structs.h"
 #define HashSize 10013
 #define DEBUG 0
-#define ThresholdOfPacketCount 20
+#define ThresholdOfPacketCount 80
 #define TimeThreshold 1
 #define isTimeBased 0
 #define isFullFlow 1
+#define isSubFlow 1
+#define location 2 // 0 flow'Un baslangıcı, 1 ortasi, 2 sonu
 
 u_int16_t handleEthernet (u_char *args,const struct pcap_pkthdr* pkthdr,const u_char* packet);//alinan paketin hangi tipte oldugunu belirlemek icin (IP,ARP vb)
 
@@ -51,6 +53,8 @@ char * extractSubclassName(char *pcapFile);
 void addToConnection(Packet *newPacket, int index);
 
 void getFeaturesFromFlow(int index);
+
+void getSubFlowFromActualFlow(int index);
 
 void allocFlowtable();
 void deallocFlowtable();

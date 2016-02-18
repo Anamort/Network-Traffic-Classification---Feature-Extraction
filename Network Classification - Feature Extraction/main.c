@@ -109,6 +109,8 @@ int main(int argc, const char * argv[]) {
     
     folder[6] = "SingleFlow/WebBrowsing/";
     */
+    
+    /*
     folder[0] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/FileTransfer/";
     folder[1] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/InstantMessaging/";
     folder[2] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/Mail/";
@@ -117,11 +119,22 @@ int main(int argc, const char * argv[]) {
     folder[4] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/Streaming/";
     
     folder[5] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/VoIP/";
+    */
+    folder[0] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/FileTransfer/";
+    folder[1] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/InstantMessaging/";
+    folder[2] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/Mail/";
+    folder[3] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/Music/";
+    folder[4] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/SocialMedia/";
     
-    DIR *dir;
-    struct dirent *ent;
+    folder[5] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/Video/";
     
-    for (int i=0; i<6; i++) {
+    folder[6] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/WebBrowsing/";
+     
+    
+    
+    for (int i=0; i<7; i++) {
+        DIR *dir = NULL;
+        struct dirent *ent = NULL;
         /*
         if (i==0) {
             className = "InstantMessaging";
@@ -155,13 +168,17 @@ int main(int argc, const char * argv[]) {
             className = "Mail";
             //className = "DDos";
         }else if (i==3){
-            className = "P2P";
+            className = "Music";
             //className = "Dos";
         }else if (i==4){
-            className = "Streaming";
+            className = "SocialMedia";
             //className = "Normal";
         }else if (i==5){
-            className = "VoIP";
+            className = "Video";
+            //className = "PortTaramaVeExploitation";
+        }
+        else if (i==6){
+            className = "WebBrowsing";
             //className = "PortTaramaVeExploitation";
         }
         printf("Class Name: %s\n",className);
@@ -172,7 +189,7 @@ int main(int argc, const char * argv[]) {
                     //printf ("%s\n", ent->d_name);
                     subClass = extractSubclassName(ent->d_name);
                     printf("Reading subclass: %s\n",subClass);
-                    char *absolutePath = (char *)calloc(100, sizeof(char));
+                    char *absolutePath = (char *)calloc(120, sizeof(char));
                     strcat(absolutePath, folder[i]);
                     strcat(absolutePath, ent->d_name);
                     allocFlowtable();
@@ -198,7 +215,12 @@ int main(int argc, const char * argv[]) {
                     
                     for (int index=0; index<HashSize; index++) {
                         if (flowTable[index]!=NULL) {
-                            getFeaturesFromFlow(index);
+                            if (isSubFlow) {
+                                getSubFlowFromActualFlow(index);
+                            }else{
+                               getFeaturesFromFlow(index);
+                            }
+                            
                         }
                     }
                     
