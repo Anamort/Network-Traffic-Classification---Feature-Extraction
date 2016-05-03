@@ -120,6 +120,8 @@ int main(int argc, const char * argv[]) {
     
     folder[5] = "/Volumes/Baris PC/Pcaps/iscxNTVPN2015/Classes/VoIP/";
     */
+    
+    
     folder[0] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/FileTransfer/";
     folder[1] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/InstantMessaging/";
     folder[2] = "/Users/barisyamansavascilar/Desktop/Traffic Classification Dosyalar/TheNewDataSet/Mail/";
@@ -159,6 +161,7 @@ int main(int argc, const char * argv[]) {
             //className = "SQLInjection";
         }
          */
+        
         if (i==0) {
             className = "FileTransfer";
         }else if (i==1){
@@ -181,6 +184,28 @@ int main(int argc, const char * argv[]) {
             className = "WebBrowsing";
             //className = "PortTaramaVeExploitation";
         }
+         
+        
+        /*
+        if (i==0) {
+            className = "FileTransfer";
+        }else if (i==1){
+            className = "InstantMessaging";
+            //className = "CommandInjection";
+        }else if (i==2){
+            className = "Mail";
+            //className = "DDos";
+        }else if (i==3){
+            className = "P2P";
+            //className = "Dos";
+        }else if (i==4){
+            className = "Streaming";
+            //className = "Normal";
+        }else if (i==5){
+            className = "VoIP";
+            //className = "PortTaramaVeExploitation";
+        }
+         */
         printf("Class Name: %s\n",className);
         
         if ((dir = opendir(folder[i])) != NULL) {
@@ -213,14 +238,17 @@ int main(int argc, const char * argv[]) {
                     //olmadi dongu icerisinde tum flowları dolas
                     //getFeaturesFromFlow(indexOfTheFlow);
                     
-                    for (int index=0; index<HashSize; index++) {
-                        if (flowTable[index]!=NULL) {
-                            if (isSubFlow) {
-                                getSubFlowFromActualFlow(index);
-                            }else{
-                               getFeaturesFromFlow(index);
+                    if (isFullFlow) {
+                    
+                        for (int index=0; index<HashSize; index++) {
+                            if (flowTable[index]!=NULL) {
+                                if (isSubFlow) {
+                                    getSubFlowFromActualFlow(index);
+                                }else{
+                                   getFeaturesFromFlow(index);
+                                }
+                                
                             }
-                            
                         }
                     }
                     

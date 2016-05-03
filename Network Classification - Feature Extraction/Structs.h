@@ -53,6 +53,8 @@ typedef struct Flow{
     int allByteSize;
     Packet firstPacket;
     Packet lastPacket;
+    Packet *lastForwardPacket;
+    Packet *lastBackwardPacket;
 }Flow;
 
 typedef struct Connection{

@@ -904,25 +904,35 @@ void addPacketToLinkedList (Packet *packet, int index){
         flowTable[index]->forwardPacketCount++;
         if (flowTable[index]->forwardPackets == NULL) {
             flowTable[index]->forwardPackets = packet;
+            flowTable[index]->lastForwardPacket = packet; //yama
         }else{
+            /* eski kod
             Packet *tempPacket = (Packet *)malloc(sizeof(Packet));
             tempPacket = flowTable[index]->forwardPackets; //forwardPackets'in ilk paketi
             while (tempPacket->nextPacket != NULL) {    //bu ilk paketten baslanarak listesinin sonuna kadar gidiliyor ve paket ekleniyor
                 tempPacket = tempPacket->nextPacket;
             }
             tempPacket->nextPacket = packet;
+             */
+            flowTable[index]->lastForwardPacket->nextPacket = packet; //yama
+            flowTable[index]->lastForwardPacket = packet; //yama
         }
     }else{ //for backward packets (forwardPackets ile aynı mantık)
         flowTable[index]->backwardPacketCount++;
         if (flowTable[index]->backwardPackets == NULL) {
             flowTable[index]->backwardPackets = packet;
+            flowTable[index]->lastBackwardPacket = packet; //yama
         }else{
+            /* eski kod
             Packet *tempPacket = (Packet *)malloc(sizeof(Packet));
             tempPacket = flowTable[index]->backwardPackets;
             while (tempPacket->nextPacket != NULL) {
                 tempPacket = tempPacket->nextPacket;
             }
             tempPacket->nextPacket = packet;
+             */
+            flowTable[index]->lastBackwardPacket->nextPacket = packet; //yama
+            flowTable[index]->lastBackwardPacket = packet; //yama
         }
     }
 }
